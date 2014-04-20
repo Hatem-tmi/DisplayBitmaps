@@ -43,8 +43,7 @@ public class MainActivity extends FragmentActivity {
 
 		// The ImageFetcher takes care of loading images into our ImageView
 		// children asynchronously
-		mImageFetcher = new ImageFetcher(getApplicationContext(),
-				mImageThumbSize);
+		mImageFetcher = new ImageFetcher(getApplicationContext());
 		mImageFetcher.setLoadingImage(R.drawable.ic_launcher);
 		mImageFetcher.addImageCache(getSupportFragmentManager(), cacheParams);
 		

@@ -119,7 +119,9 @@ public class ImageAdapter extends BaseAdapter {
 		// takes care of
 		// setting a placeholder image while the background thread runs
 		mImageFetcher.loadImage(
-				Constants.imageThumbUrls[position - mNumColumns], imageView);
+				Constants.imageThumbUrls[position - mNumColumns], 100,
+				imageView);
+
 		return imageView;
 		// END_INCLUDE(load_gridview_item)
 	}

@@ -55,23 +55,9 @@ public class ImageFetcher extends ImageResizer {
 	 * images.
 	 * 
 	 * @param context
-	 * @param imageWidth
-	 * @param imageHeight
 	 */
-	public ImageFetcher(Context context, int imageWidth, int imageHeight) {
-		super(context, imageWidth, imageHeight);
-		init(context);
-	}
-
-	/**
-	 * Initialize providing a single target image size (used for both width and
-	 * height);
-	 * 
-	 * @param context
-	 * @param imageSize
-	 */
-	public ImageFetcher(Context context, int imageSize) {
-		super(context, imageSize);
+	public ImageFetcher(Context context) {
+		super(context);
 		init(context);
 	}
 
@@ -183,7 +169,7 @@ public class ImageFetcher extends ImageResizer {
 	 *            The data to load the bitmap, in this case, a regular http URL
 	 * @return The downloaded and resized bitmap
 	 */
-	private Bitmap processBitmap(String data) {
+	private Bitmap processBitmap(String data, int size) {
 		Log.d(TAG, "processBitmap - " + data);
 
 		final String key = ImageCache.hashKeyForDisk(data);
@@ -239,8 +225,8 @@ public class ImageFetcher extends ImageResizer {
 
 		Bitmap bitmap = null;
 		if (fileDescriptor != null) {
-			bitmap = decodeSampledBitmapFromDescriptor(fileDescriptor,
-					mImageWidth, mImageHeight, getImageCache());
+			bitmap = decodeSampledBitmapFromDescriptor(fileDescriptor, size,
+					size, getImageCache());
 		}
 		if (fileInputStream != null) {
 			try {
@@ -252,8 +238,8 @@ public class ImageFetcher extends ImageResizer {
 	}
 
 	@Override
-	protected Bitmap processBitmap(Object data) {
-		return processBitmap(String.valueOf(data));
+	protected Bitmap processBitmap(Object data, int size) {
+		return processBitmap(String.valueOf(data), size);
 	}
 
 	/**
