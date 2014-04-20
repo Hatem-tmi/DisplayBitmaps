@@ -10,6 +10,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 
 import com.test.displaybitmapsproject.imagemanager.ImageFetcher;
+import com.test.displaybitmapsproject.imagemanager.ImageSize;
 import com.test.displaybitmapsproject.imagemanager.RecyclingImageView;
 
 /**
@@ -119,7 +120,7 @@ public class ImageAdapter extends BaseAdapter {
 		// takes care of
 		// setting a placeholder image while the background thread runs
 		mImageFetcher.loadImage(
-				Constants.imageThumbUrls[position - mNumColumns], 100,
+				Constants.imageThumbUrls[position - mNumColumns], ImageSize.medium,
 				imageView);
 
 		return imageView;

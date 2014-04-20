@@ -76,11 +76,11 @@ public abstract class ImageWorker {
 	 * 
 	 * @param data
 	 *            The URL of the image to download.
-	 * @param size
+	 * @param imageSize
 	 * @param imageView
 	 *            The ImageView to bind the downloaded image to.
 	 */
-	public void loadImage(Object data, int size, ImageView imageView) {
+	public void loadImage(Object data, ImageSize imageSize, ImageView imageView) {
 		if (data == null) {
 			return;
 		}
@@ -88,7 +88,8 @@ public abstract class ImageWorker {
 		BitmapDrawable value = null;
 
 		if (mImageCache != null) {
-			value = mImageCache.getBitmapFromMemCache(String.valueOf(data));
+			value = mImageCache.getBitmapFromMemCache(String.valueOf(data),
+					imageSize);
 		}
 
 		if (value != null) {
@@ -96,7 +97,7 @@ public abstract class ImageWorker {
 			imageView.setImageDrawable(value);
 		} else if (cancelPotentialWork(data, imageView)) {
 			// BEGIN_INCLUDE(execute_background_task)
-			final BitmapWorkerTask task = new BitmapWorkerTask(data, size,
+			final BitmapWorkerTask task = new BitmapWorkerTask(data, imageSize,
 					imageView);
 			final AsyncDrawable asyncDrawable = new AsyncDrawable(mResources,
 					mLoadingBitmap, task);
@@ -189,10 +190,10 @@ public abstract class ImageWorker {
 	 * @param data
 	 *            The data to identify which image to process, as provided by
 	 *            {@link ImageWorker#loadImage(Object, android.widget.ImageView)}
-	 * @param size
+	 * @param imageSize
 	 * @return The processed bitmap
 	 */
-	protected abstract Bitmap processBitmap(Object data, int size);
+	protected abstract Bitmap processBitmap(Object data, ImageSize imageSize);
 
 	/**
 	 * @return The {@link ImageCache} object currently being used by this
@@ -267,12 +268,13 @@ public abstract class ImageWorker {
 	private class BitmapWorkerTask extends
 			AsyncTask<Void, Void, BitmapDrawable> {
 		private Object mData;
-		private int mSize;
+		private ImageSize mImageSize;
 		private final WeakReference<ImageView> imageViewReference;
 
-		public BitmapWorkerTask(Object data, int size, ImageView imageView) {
+		public BitmapWorkerTask(Object data, ImageSize imageSize,
+				ImageView imageView) {
 			mData = data;
-			mSize = size;
+			mImageSize = imageSize;
 			imageViewReference = new WeakReference<ImageView>(imageView);
 		}
 
@@ -309,7 +311,8 @@ public abstract class ImageWorker {
 			// the cache
 			if (mImageCache != null && !isCancelled()
 					&& getAttachedImageView() != null && !mExitTasksEarly) {
-				bitmap = mImageCache.getBitmapFromDiskCache(dataString);
+				bitmap = mImageCache.getBitmapFromDiskCache(dataString,
+						mImageSize);
 			}
 
 			// If the bitmap was not found in the cache and this task has not
@@ -321,7 +324,7 @@ public abstract class ImageWorker {
 			// process method (as implemented by a subclass)
 			if (bitmap == null && !isCancelled()
 					&& getAttachedImageView() != null && !mExitTasksEarly) {
-				bitmap = processBitmap(mData, mSize);
+				bitmap = processBitmap(mData, mImageSize);
 			}
 
 			// If the bitmap was processed and the image cache is available,
@@ -344,7 +347,8 @@ public abstract class ImageWorker {
 				}
 
 				if (mImageCache != null) {
-					mImageCache.addBitmapToCache(dataString, drawable);
+					mImageCache.addBitmapToCache(dataString, mImageSize,
+							drawable);
 				}
 			}
 

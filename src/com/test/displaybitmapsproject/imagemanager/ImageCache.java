@@ -253,14 +253,19 @@ public class ImageCache {
 	 * 
 	 * @param data
 	 *            Unique identifier for the bitmap to store
+	 * @param imageSize
 	 * @param value
 	 *            The bitmap drawable to store
 	 */
-	public void addBitmapToCache(String data, BitmapDrawable value) {
+	public void addBitmapToCache(String data, ImageSize imageSize,
+			BitmapDrawable value) {
 		// BEGIN_INCLUDE(add_bitmap_to_cache)
 		if (data == null || value == null) {
 			return;
 		}
+
+		// concat data + imageSize
+		data += imageSize.getSize();
 
 		// Add to memory cache
 		if (mMemoryCache != null) {
@@ -315,11 +320,15 @@ public class ImageCache {
 	 * 
 	 * @param data
 	 *            Unique identifier for which item to get
+	 * @param imageSize
 	 * @return The bitmap drawable if found in cache, null otherwise
 	 */
-	public BitmapDrawable getBitmapFromMemCache(String data) {
+	public BitmapDrawable getBitmapFromMemCache(String data, ImageSize imageSize) {
 		// BEGIN_INCLUDE(get_bitmap_from_mem_cache)
 		BitmapDrawable memValue = null;
+
+		// concat data + imageSize
+		data += imageSize.getSize();
 
 		if (mMemoryCache != null) {
 			memValue = mMemoryCache.get(data);
@@ -338,10 +347,15 @@ public class ImageCache {
 	 * 
 	 * @param data
 	 *            Unique identifier for which item to get
+	 * @param imageSize
 	 * @return The bitmap if found in cache, null otherwise
 	 */
-	public Bitmap getBitmapFromDiskCache(String data) {
+	public Bitmap getBitmapFromDiskCache(String data, ImageSize imageSize) {
 		// BEGIN_INCLUDE(get_bitmap_from_disk_cache)
+
+		// concat data + imageSize
+		data += imageSize.getSize();
+
 		final String key = hashKeyForDisk(data);
 		Bitmap bitmap = null;
 

@@ -167,9 +167,11 @@ public class ImageFetcher extends ImageResizer {
 	 * 
 	 * @param data
 	 *            The data to load the bitmap, in this case, a regular http URL
+	 * @param ImageSize
+	 *            imageSize
 	 * @return The downloaded and resized bitmap
 	 */
-	private Bitmap processBitmap(String data, int size) {
+	private Bitmap processBitmap(String data, ImageSize imageSize) {
 		Log.d(TAG, "processBitmap - " + data);
 
 		final String key = ImageCache.hashKeyForDisk(data);
@@ -225,8 +227,8 @@ public class ImageFetcher extends ImageResizer {
 
 		Bitmap bitmap = null;
 		if (fileDescriptor != null) {
-			bitmap = decodeSampledBitmapFromDescriptor(fileDescriptor, size,
-					size, getImageCache());
+			bitmap = decodeSampledBitmapFromDescriptor(fileDescriptor,
+					imageSize.getSize(), imageSize.getSize(), getImageCache());
 		}
 		if (fileInputStream != null) {
 			try {
@@ -238,8 +240,8 @@ public class ImageFetcher extends ImageResizer {
 	}
 
 	@Override
-	protected Bitmap processBitmap(Object data, int size) {
-		return processBitmap(String.valueOf(data), size);
+	protected Bitmap processBitmap(Object data, ImageSize imageSize) {
+		return processBitmap(String.valueOf(data), imageSize);
 	}
 
 	/**

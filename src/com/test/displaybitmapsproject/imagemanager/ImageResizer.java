@@ -53,17 +53,18 @@ public class ImageResizer extends ImageWorker {
 	 * resource.
 	 * 
 	 * @param resId
+	 * @param imageSize
 	 * @return
 	 */
-	private Bitmap processBitmap(int resId, int size) {
+	private Bitmap processBitmap(int resId, ImageSize imageSize) {
 		Log.d(TAG, "processBitmap - " + resId);
-		return decodeSampledBitmapFromResource(mResources, resId, size, size,
-				getImageCache());
+		return decodeSampledBitmapFromResource(mResources, resId,
+				imageSize.getSize(), imageSize.getSize(), getImageCache());
 	}
 
 	@Override
-	protected Bitmap processBitmap(Object data, int size) {
-		return processBitmap(Integer.parseInt(String.valueOf(data)), size);
+	protected Bitmap processBitmap(Object data, ImageSize imageSize) {
+		return processBitmap(Integer.parseInt(String.valueOf(data)), imageSize);
 	}
 
 	/**
