@@ -1,4 +1,4 @@
-package com.test.displaybitmapsproject.activity;
+package com.test.displaybitmaps.activity;
 
 public class Constants {
 	/**

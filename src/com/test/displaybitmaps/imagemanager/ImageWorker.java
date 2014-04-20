@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.test.displaybitmapsproject.imagemanager;
+package com.test.displaybitmaps.imagemanager;
 
 import java.lang.ref.WeakReference;
 
@@ -33,7 +33,7 @@ import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.widget.ImageView;
 
-import com.test.displaybitmapsproject.BuildConfig;
+import com.test.displaybitmaps.BuildConfig;
 
 /**
  * This class wraps up completing some arbitrary long running work when loading

@@ -1,4 +1,4 @@
-package com.test.displaybitmapsproject.imagemanager;
+package com.test.displaybitmaps.imagemanager;
 
 /**
  * ImageSize used to download images by needed size

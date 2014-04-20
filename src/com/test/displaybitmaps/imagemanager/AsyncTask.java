@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.test.displaybitmapsproject.imagemanager;
+package com.test.displaybitmaps.imagemanager;
 
 import java.util.ArrayDeque;
 import java.util.concurrent.BlockingQueue;

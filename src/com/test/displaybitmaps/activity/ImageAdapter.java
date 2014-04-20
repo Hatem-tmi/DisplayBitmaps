@@ -1,4 +1,4 @@
-package com.test.displaybitmapsproject.activity;
+package com.test.displaybitmaps.activity;
 
 import android.content.Context;
 import android.util.TypedValue;
@@ -9,9 +9,9 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
-import com.test.displaybitmapsproject.imagemanager.ImageFetcher;
-import com.test.displaybitmapsproject.imagemanager.ImageSize;
-import com.test.displaybitmapsproject.imagemanager.RecyclingImageView;
+import com.test.displaybitmaps.imagemanager.ImageFetcher;
+import com.test.displaybitmaps.imagemanager.ImageSize;
+import com.test.displaybitmaps.imagemanager.RecyclingImageView;
 
 /**
  * The main adapter that backs the GridView. This is fairly standard except the

@@ -1,4 +1,4 @@
-package com.test.displaybitmapsproject.activity;
+package com.test.displaybitmaps.activity;
 
 import android.annotation.TargetApi;
 import android.os.Build;
@@ -10,9 +10,9 @@ import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.GridView;
 
-import com.test.displaybitmapsproject.R;
-import com.test.displaybitmapsproject.imagemanager.ImageCache;
-import com.test.displaybitmapsproject.imagemanager.ImageFetcher;
+import com.test.displaybitmaps.imagemanager.ImageCache;
+import com.test.displaybitmaps.imagemanager.ImageFetcher;
+import com.test.displaybitmaps.R;
 
 public class MainActivity extends FragmentActivity {
 	private static final String TAG = "MainActivity";
