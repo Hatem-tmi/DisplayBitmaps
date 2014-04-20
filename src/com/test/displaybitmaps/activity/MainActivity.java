@@ -16,7 +16,6 @@ import com.test.displaybitmaps.R;
 
 public class MainActivity extends FragmentActivity {
 	private static final String TAG = "MainActivity";
-	private static final String IMAGE_CACHE_DIR = "thumbs";
 
 	private GridView mGridView;
 
@@ -36,7 +35,7 @@ public class MainActivity extends FragmentActivity {
 				R.dimen.image_thumbnail_spacing);
 
 		ImageCache.ImageCacheParams cacheParams = new ImageCache.ImageCacheParams(
-				getApplicationContext(), IMAGE_CACHE_DIR);
+				getApplicationContext());
 
 		cacheParams.setMemCacheSizePercent(0.25f); // Set memory cache to 25% of
 													// app memory
@@ -70,6 +69,12 @@ public class MainActivity extends FragmentActivity {
 	public void onDestroy() {
 		super.onDestroy();
 		mImageFetcher.closeCache();
+	}
+
+	@Override
+	public void onLowMemory() {
+		super.onLowMemory();
+		mImageFetcher.getImageCache().clearMemoryCache();
 	}
 
 	/**

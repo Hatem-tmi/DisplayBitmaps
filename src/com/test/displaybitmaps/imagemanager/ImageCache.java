@@ -57,6 +57,7 @@ import android.util.Log;
  */
 public class ImageCache {
 	private static final String TAG = "ImageCache";
+	private static final String DISK_CACHE_DIR = "images_cache";
 
 	// Default memory cache size in kilobytes
 	private static final int DEFAULT_MEM_CACHE_SIZE = 1024 * 5; // 5MB
@@ -451,12 +452,25 @@ public class ImageCache {
 	 * executed on the main/UI thread.
 	 */
 	public void clearCache() {
+		clearMemoryCache();
+		clearDiskCache();
+	}
+	
+	/**
+	 * Clears MemoryCache
+	 */
+	public void clearMemoryCache() {
 		if (mMemoryCache != null) {
 			mMemoryCache.evictAll();
 
 			Log.d(TAG, "Memory cache cleared");
 		}
-
+	}
+	
+	/**
+	 * Clears DiskCache
+	 */
+	public void clearDiskCache() {
 		synchronized (mDiskCacheLock) {
 			mDiskCacheStarting = true;
 			if (mDiskLruCache != null && !mDiskLruCache.isClosed()) {
@@ -536,13 +550,12 @@ public class ImageCache {
 		 * 
 		 * @param context
 		 *            A context to use.
-		 * @param diskCacheDirectoryName
 		 *            A unique subdirectory name that will be appended to the
 		 *            application cache directory. Usually "cache" or "images"
 		 *            is sufficient.
 		 */
-		public ImageCacheParams(Context context, String diskCacheDirectoryName) {
-			diskCacheDir = getDiskCacheDir(context, diskCacheDirectoryName);
+		public ImageCacheParams(Context context) {
+			diskCacheDir = getDiskCacheDir(context, DISK_CACHE_DIR);
 		}
 
 		/**

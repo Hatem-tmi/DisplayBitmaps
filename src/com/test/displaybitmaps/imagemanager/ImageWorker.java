@@ -161,8 +161,7 @@ public abstract class ImageWorker {
 	 */
 	public void addImageCache(FragmentActivity activity,
 			String diskCacheDirectoryName) {
-		mImageCacheParams = new ImageCache.ImageCacheParams(activity,
-				diskCacheDirectoryName);
+		mImageCacheParams = new ImageCache.ImageCacheParams(activity);
 		mImageCache = ImageCache.getInstance(
 				activity.getSupportFragmentManager(), mImageCacheParams);
 		new CacheAsyncTask().execute(MESSAGE_INIT_DISK_CACHE);
@@ -199,7 +198,7 @@ public abstract class ImageWorker {
 	 * @return The {@link ImageCache} object currently being used by this
 	 *         ImageWorker.
 	 */
-	protected ImageCache getImageCache() {
+	public ImageCache getImageCache() {
 		return mImageCache;
 	}
 
