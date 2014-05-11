@@ -10,9 +10,9 @@ import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.GridView;
 
-import com.test.displaybitmaps.imagemanager.ImageCache;
-import com.test.displaybitmaps.imagemanager.ImageFetcher;
 import com.test.displaybitmaps.R;
+import com.test.displaybitmaps.imagemanager.ImageCacheParams;
+import com.test.displaybitmaps.imagemanager.ImageFetcher;
 
 public class MainActivity extends FragmentActivity {
 	private static final String TAG = "MainActivity";
@@ -34,7 +34,7 @@ public class MainActivity extends FragmentActivity {
 		mImageThumbSpacing = getResources().getDimensionPixelSize(
 				R.dimen.image_thumbnail_spacing);
 
-		ImageCache.ImageCacheParams cacheParams = new ImageCache.ImageCacheParams(
+		ImageCacheParams cacheParams = new ImageCacheParams(
 				getApplicationContext());
 
 		cacheParams.setMemCacheSizePercent(0.25f); // Set memory cache to 25% of
@@ -44,8 +44,8 @@ public class MainActivity extends FragmentActivity {
 		// children asynchronously
 		mImageFetcher = new ImageFetcher(getApplicationContext());
 		mImageFetcher.setLoadingImage(R.drawable.ic_launcher);
-		mImageFetcher.addImageCache(getSupportFragmentManager(), cacheParams);
-		
+		mImageFetcher.addImageCache(cacheParams);
+
 		// initialize views
 		initViews();
 	}
@@ -80,8 +80,7 @@ public class MainActivity extends FragmentActivity {
 	/**
 	 * Initialize views
 	 */
-	private void initViews()
-	{
+	private void initViews() {
 		mGridView = (GridView) findViewById(R.id.gridView);
 		mAdapter = new ImageAdapter(getApplicationContext(), mImageFetcher);
 

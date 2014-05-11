@@ -28,12 +28,8 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.widget.ImageView;
-
-import com.test.displaybitmaps.BuildConfig;
 
 /**
  * This class wraps up completing some arbitrary long running work when loading
@@ -46,7 +42,7 @@ public abstract class ImageWorker {
 	private static final int FADE_IN_TIME = 200;
 
 	private ImageCache mImageCache;
-	private ImageCache.ImageCacheParams mImageCacheParams;
+	private ImageCacheParams mImageCacheParams;
 	private Bitmap mLoadingBitmap;
 	private boolean mFadeInBitmap = true;
 	private boolean mExitTasksEarly = false;
@@ -137,33 +133,13 @@ public abstract class ImageWorker {
 	 * Adds an {@link ImageCache} to this {@link ImageWorker} to handle disk and
 	 * memory bitmap caching.
 	 * 
-	 * @param fragmentManager
 	 * @param cacheParams
 	 *            The cache parameters to use for the image cache.
 	 */
-	public void addImageCache(FragmentManager fragmentManager,
-			ImageCache.ImageCacheParams cacheParams) {
+	public void addImageCache(ImageCacheParams cacheParams) {
 		mImageCacheParams = cacheParams;
-		mImageCache = ImageCache
-				.getInstance(fragmentManager, mImageCacheParams);
-		new CacheAsyncTask().execute(MESSAGE_INIT_DISK_CACHE);
-	}
-
-	/**
-	 * Adds an {@link ImageCache} to this {@link ImageWorker} to handle disk and
-	 * memory bitmap caching.
-	 * 
-	 * @param activity
-	 * @param diskCacheDirectoryName
-	 *            See
-	 *            {@link ImageCache.ImageCacheParams#ImageCacheParams(android.content.Context, String)}
-	 *            .
-	 */
-	public void addImageCache(FragmentActivity activity,
-			String diskCacheDirectoryName) {
-		mImageCacheParams = new ImageCache.ImageCacheParams(activity);
-		mImageCache = ImageCache.getInstance(
-				activity.getSupportFragmentManager(), mImageCacheParams);
+		mImageCache = ImageCache.getInstance();
+		mImageCache.setupImageCacheParams(mImageCacheParams);
 		new CacheAsyncTask().execute(MESSAGE_INIT_DISK_CACHE);
 	}
 
@@ -211,10 +187,9 @@ public abstract class ImageWorker {
 		final BitmapWorkerTask bitmapWorkerTask = getBitmapWorkerTask(imageView);
 		if (bitmapWorkerTask != null) {
 			bitmapWorkerTask.cancel(true);
-			if (BuildConfig.DEBUG) {
-				final Object bitmapData = bitmapWorkerTask.mData;
-				Log.d(TAG, "cancelWork - cancelled work for " + bitmapData);
-			}
+
+			final Object bitmapData = bitmapWorkerTask.mData;
+			Log.d(TAG, "cancelWork - cancelled work for " + bitmapData);
 		}
 	}
 
@@ -231,10 +206,8 @@ public abstract class ImageWorker {
 			final Object bitmapData = bitmapWorkerTask.mData;
 			if (bitmapData == null || !bitmapData.equals(data)) {
 				bitmapWorkerTask.cancel(true);
-				if (BuildConfig.DEBUG) {
-					Log.d(TAG, "cancelPotentialWork - cancelled work for "
-							+ data);
-				}
+
+				Log.d(TAG, "cancelPotentialWork - cancelled work for " + data);
 			} else {
 				// The same work is already in progress.
 				return false;
@@ -283,9 +256,7 @@ public abstract class ImageWorker {
 		@Override
 		protected BitmapDrawable doInBackground(Void... params) {
 			// BEGIN_INCLUDE(load_bitmap_in_background)
-			if (BuildConfig.DEBUG) {
-				Log.d(TAG, "doInBackground - starting work");
-			}
+			Log.d(TAG, "doInBackground - starting work");
 
 			final String dataString = String.valueOf(mData);
 			Bitmap bitmap = null;
@@ -350,10 +321,7 @@ public abstract class ImageWorker {
 							drawable);
 				}
 			}
-
-			if (BuildConfig.DEBUG) {
-				Log.d(TAG, "doInBackground - finished work");
-			}
+			Log.d(TAG, "doInBackground - finished work");
 
 			return drawable;
 			// END_INCLUDE(load_bitmap_in_background)
@@ -373,9 +341,7 @@ public abstract class ImageWorker {
 
 			final ImageView imageView = getAttachedImageView();
 			if (value != null && imageView != null) {
-				if (BuildConfig.DEBUG) {
-					Log.d(TAG, "onPostExecute - setting bitmap");
-				}
+				Log.d(TAG, "onPostExecute - setting bitmap");
 				setImageDrawable(imageView, value);
 			}
 			// END_INCLUDE(complete_background_work)

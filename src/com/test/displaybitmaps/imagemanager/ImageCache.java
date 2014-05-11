@@ -33,16 +33,12 @@ import java.util.Set;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Build.VERSION_CODES;
-import android.os.Bundle;
 import android.os.StatFs;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.util.LruCache;
 import android.util.Log;
 
@@ -57,24 +53,9 @@ import android.util.Log;
  */
 public class ImageCache {
 	private static final String TAG = "ImageCache";
-	private static final String DISK_CACHE_DIR = "images_cache";
-
-	// Default memory cache size in kilobytes
-	private static final int DEFAULT_MEM_CACHE_SIZE = 1024 * 5; // 5MB
-
-	// Default disk cache size in bytes
-	private static final int DEFAULT_DISK_CACHE_SIZE = 1024 * 1024 * 10; // 10MB
-
-	// Compression settings when writing images to disk cache
-	private static final CompressFormat DEFAULT_COMPRESS_FORMAT = CompressFormat.JPEG;
-	private static final int DEFAULT_COMPRESS_QUALITY = 70;
 	private static final int DISK_CACHE_INDEX = 0;
 
-	// Constants to easily toggle various caches
-	private static final boolean DEFAULT_MEM_CACHE_ENABLED = true;
-	private static final boolean DEFAULT_DISK_CACHE_ENABLED = true;
-	private static final boolean DEFAULT_INIT_DISK_CACHE_ON_CREATE = false;
-
+	private static ImageCache instance = null;
 	private DiskLruCache mDiskLruCache;
 	private LruCache<String, BitmapDrawable> mMemoryCache;
 	private ImageCacheParams mCacheParams;
@@ -84,57 +65,30 @@ public class ImageCache {
 	private Set<SoftReference<Bitmap>> mReusableBitmaps;
 
 	/**
-	 * Create a new ImageCache object using the specified parameters. This
-	 * should not be called directly by other classes, instead use
-	 * {@link ImageCache#getInstance(android.support.v4.app.FragmentManager, ImageCacheParams)}
-	 * to fetch an ImageCache instance.
-	 * 
-	 * @param cacheParams
-	 *            The cache parameters to use to initialize the cache
-	 */
-	private ImageCache(ImageCacheParams cacheParams) {
-		init(cacheParams);
-	}
-
-	/**
 	 * Return an {@link ImageCache} instance. A {@link RetainFragment} is used
 	 * to retain the ImageCache object across configuration changes such as a
 	 * change in device orientation.
 	 * 
-	 * @param fragmentManager
-	 *            The fragment manager to use when dealing with the retained
-	 *            fragment.
-	 * @param cacheParams
-	 *            The cache parameters to use if the ImageCache needs
-	 *            instantiation.
 	 * @return An existing retained ImageCache object or a new one if one did
 	 *         not exist
 	 */
-	public static ImageCache getInstance(FragmentManager fragmentManager,
-			ImageCacheParams cacheParams) {
+	public static ImageCache getInstance() {
 
-		// Search for, or create an instance of the non-UI RetainFragment
-		final RetainFragment mRetainFragment = findOrCreateRetainFragment(fragmentManager);
-
-		// See if we already have an ImageCache stored in RetainFragment
-		ImageCache imageCache = (ImageCache) mRetainFragment.getObject();
-
-		// No existing ImageCache, create one and store it in RetainFragment
-		if (imageCache == null) {
-			imageCache = new ImageCache(cacheParams);
-			mRetainFragment.setObject(imageCache);
+		// No existing ImageCache, create one and store it
+		if (instance == null) {
+			instance = new ImageCache();
 		}
 
-		return imageCache;
+		return instance;
 	}
 
 	/**
-	 * Initialize the cache, providing all parameters.
+	 * Set up the image-cache params, providing all parameters.
 	 * 
 	 * @param cacheParams
 	 *            The cache parameters to initialize the cache
 	 */
-	private void init(ImageCacheParams cacheParams) {
+	public void setupImageCacheParams(ImageCacheParams cacheParams) {
 		mCacheParams = cacheParams;
 
 		// BEGIN_INCLUDE(init_memory_cache)
@@ -455,7 +409,7 @@ public class ImageCache {
 		clearMemoryCache();
 		clearDiskCache();
 	}
-	
+
 	/**
 	 * Clears MemoryCache
 	 */
@@ -466,7 +420,7 @@ public class ImageCache {
 			Log.d(TAG, "Memory cache cleared");
 		}
 	}
-	
+
 	/**
 	 * Clears DiskCache
 	 */
@@ -525,64 +479,6 @@ public class ImageCache {
 					Log.e(TAG, "close - " + e);
 				}
 			}
-		}
-	}
-
-	/**
-	 * A holder class that contains cache parameters.
-	 */
-	public static class ImageCacheParams {
-		public int memCacheSize = DEFAULT_MEM_CACHE_SIZE;
-		public int diskCacheSize = DEFAULT_DISK_CACHE_SIZE;
-		public File diskCacheDir;
-		public CompressFormat compressFormat = DEFAULT_COMPRESS_FORMAT;
-		public int compressQuality = DEFAULT_COMPRESS_QUALITY;
-		public boolean memoryCacheEnabled = DEFAULT_MEM_CACHE_ENABLED;
-		public boolean diskCacheEnabled = DEFAULT_DISK_CACHE_ENABLED;
-		public boolean initDiskCacheOnCreate = DEFAULT_INIT_DISK_CACHE_ON_CREATE;
-
-		/**
-		 * Create a set of image cache parameters that can be provided to
-		 * {@link ImageCache#getInstance(android.support.v4.app.FragmentManager, ImageCacheParams)}
-		 * or
-		 * {@link ImageWorker#addImageCache(android.support.v4.app.FragmentManager, ImageCacheParams)}
-		 * .
-		 * 
-		 * @param context
-		 *            A context to use.
-		 *            A unique subdirectory name that will be appended to the
-		 *            application cache directory. Usually "cache" or "images"
-		 *            is sufficient.
-		 */
-		public ImageCacheParams(Context context) {
-			diskCacheDir = getDiskCacheDir(context, DISK_CACHE_DIR);
-		}
-
-		/**
-		 * Sets the memory cache size based on a percentage of the max available
-		 * VM memory. Eg. setting percent to 0.2 would set the memory cache to
-		 * one fifth of the available memory. Throws
-		 * {@link IllegalArgumentException} if percent is < 0.01 or > .8.
-		 * memCacheSize is stored in kilobytes instead of bytes as this will
-		 * eventually be passed to construct a LruCache which takes an int in
-		 * its constructor.
-		 * 
-		 * This value should be chosen carefully based on a number of factors
-		 * Refer to the corresponding Android Training class for more
-		 * discussion: http://developer.android.com/training/displaying-bitmaps/
-		 * 
-		 * @param percent
-		 *            Percent of available app memory to use to size memory
-		 *            cache
-		 */
-		public void setMemCacheSizePercent(float percent) {
-			if (percent < 0.01f || percent > 0.8f) {
-				throw new IllegalArgumentException(
-						"setMemCacheSizePercent - percent must be "
-								+ "between 0.01 and 0.8 (inclusive)");
-			}
-			memCacheSize = Math.round(percent
-					* Runtime.getRuntime().maxMemory() / 1024);
 		}
 	}
 
@@ -725,73 +621,4 @@ public class ImageCache {
 		final StatFs stats = new StatFs(path.getPath());
 		return (long) stats.getBlockSize() * (long) stats.getAvailableBlocks();
 	}
-
-	/**
-	 * Locate an existing instance of this Fragment or if not found, create and
-	 * add it using FragmentManager.
-	 * 
-	 * @param fm
-	 *            The FragmentManager manager to use.
-	 * @return The existing instance of the Fragment or the new instance if just
-	 *         created.
-	 */
-	private static RetainFragment findOrCreateRetainFragment(FragmentManager fm) {
-		// BEGIN_INCLUDE(find_create_retain_fragment)
-		// Check to see if we have retained the worker fragment.
-		RetainFragment mRetainFragment = (RetainFragment) fm
-				.findFragmentByTag(TAG);
-
-		// If not retained (or first time running), we need to create and add
-		// it.
-		if (mRetainFragment == null) {
-			mRetainFragment = new RetainFragment();
-			fm.beginTransaction().add(mRetainFragment, TAG)
-					.commitAllowingStateLoss();
-		}
-
-		return mRetainFragment;
-		// END_INCLUDE(find_create_retain_fragment)
-	}
-
-	/**
-	 * A simple non-UI Fragment that stores a single Object and is retained over
-	 * configuration changes. It will be used to retain the ImageCache object.
-	 */
-	public static class RetainFragment extends Fragment {
-		private Object mObject;
-
-		/**
-		 * Empty constructor as per the Fragment documentation
-		 */
-		public RetainFragment() {
-		}
-
-		@Override
-		public void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-
-			// Make sure this Fragment is retained over a configuration change
-			setRetainInstance(true);
-		}
-
-		/**
-		 * Store a single object in this Fragment.
-		 * 
-		 * @param object
-		 *            The object to store
-		 */
-		public void setObject(Object object) {
-			mObject = object;
-		}
-
-		/**
-		 * Get the stored object.
-		 * 
-		 * @return The stored object
-		 */
-		public Object getObject() {
-			return mObject;
-		}
-	}
-
 }

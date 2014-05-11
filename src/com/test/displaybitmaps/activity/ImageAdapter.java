@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
@@ -35,8 +36,7 @@ public class ImageAdapter extends BaseAdapter {
 		mImageFetcher = imageFetcher;
 
 		mImageViewLayoutParams = new GridView.LayoutParams(
-				GridView.LayoutParams.MATCH_PARENT,
-				GridView.LayoutParams.MATCH_PARENT);
+				LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 
 		// Calculate ActionBar height
 		TypedValue tv = new TypedValue();
@@ -96,7 +96,7 @@ public class ImageAdapter extends BaseAdapter {
 			}
 			// Set empty view with height of ActionBar
 			convertView.setLayoutParams(new AbsListView.LayoutParams(
-					AbsListView.LayoutParams.MATCH_PARENT, mActionBarHeight));
+					LayoutParams.MATCH_PARENT, mActionBarHeight));
 			return convertView;
 		}
 
@@ -120,8 +120,8 @@ public class ImageAdapter extends BaseAdapter {
 		// takes care of
 		// setting a placeholder image while the background thread runs
 		mImageFetcher.loadImage(
-				Constants.imageThumbUrls[position - mNumColumns], ImageSize.medium,
-				imageView);
+				Constants.imageThumbUrls[position - mNumColumns],
+				ImageSize.medium, imageView);
 
 		return imageView;
 		// END_INCLUDE(load_gridview_item)
@@ -139,7 +139,7 @@ public class ImageAdapter extends BaseAdapter {
 		}
 		mItemHeight = height;
 		mImageViewLayoutParams = new GridView.LayoutParams(
-				GridView.LayoutParams.MATCH_PARENT, mItemHeight);
+				LayoutParams.MATCH_PARENT, mItemHeight);
 		notifyDataSetChanged();
 	}
 
