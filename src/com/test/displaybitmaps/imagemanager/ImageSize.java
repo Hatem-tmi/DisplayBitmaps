@@ -8,6 +8,12 @@ package com.test.displaybitmaps.imagemanager;
  */
 public enum ImageSize {
 
+	xxlarge {
+		@Override
+		public int getSize() {
+			return 800;
+		}
+	},
 	xlarge {
 		@Override
 		public int getSize() {

@@ -123,6 +123,7 @@ public class MainActivity extends Activity {
 							final int numColumns = (int) Math.floor(mGridView
 									.getWidth()
 									/ (mImageThumbSize + mImageThumbSpacing));
+
 							if (numColumns > 0) {
 								final int columnWidth = (mGridView.getWidth() / numColumns)
 										- mImageThumbSpacing;

@@ -49,24 +49,19 @@ public class ImageAdapter extends BaseAdapter {
 
 	@Override
 	public int getCount() {
-		// If columns have yet to be determined, return no items
-		if (getNumColumns() == 0) {
-			return 0;
-		}
-
-		// Size + number of columns for top empty row
-		return Constants.imageThumbUrls.length + mNumColumns;
+		return Integer.MAX_VALUE;
 	}
 
 	@Override
 	public Object getItem(int position) {
-		return position < mNumColumns ? null
-				: Constants.imageThumbUrls[position - mNumColumns];
+		return Constants.imageThumbUrls[position
+				% Constants.imageThumbUrls.length - mNumColumns];
 	}
 
 	@Override
 	public long getItemId(int position) {
-		return position < mNumColumns ? 0 : position - mNumColumns;
+		return position % Constants.imageThumbUrls.length < mNumColumns ? 0
+				: position - mNumColumns;
 	}
 
 	@Override
@@ -78,7 +73,8 @@ public class ImageAdapter extends BaseAdapter {
 
 	@Override
 	public int getItemViewType(int position) {
-		return (position < mNumColumns) ? 1 : 0;
+		return (position % Constants.imageThumbUrls.length < mNumColumns) ? 1
+				: 0;
 	}
 
 	@Override
@@ -88,9 +84,8 @@ public class ImageAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup container) {
-		// BEGIN_INCLUDE(load_gridview_item)
 		// First check if this is the top row
-		if (position < mNumColumns) {
+		if (position % Constants.imageThumbUrls.length < mNumColumns) {
 			if (convertView == null) {
 				convertView = new View(mContext);
 			}
@@ -102,13 +97,16 @@ public class ImageAdapter extends BaseAdapter {
 
 		// Now handle the main ImageView thumbnails
 		ImageView imageView;
-		if (convertView == null) { // if it's not recycled, instantiate and
-									// initialize
+		if (convertView == null) {
+			// if it's not recycled, instantiate and initialize
 			imageView = new RecyclingImageView(mContext);
 			imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 			imageView.setLayoutParams(mImageViewLayoutParams);
-		} else { // Otherwise re-use the converted view
+		} else if (convertView instanceof ImageView) { // Otherwise re-use the
+														// converted view
 			imageView = (ImageView) convertView;
+		} else {
+			return convertView;
 		}
 
 		// Check the height matches our calculated column width
@@ -119,12 +117,11 @@ public class ImageAdapter extends BaseAdapter {
 		// Finally load the image asynchronously into the ImageView, this also
 		// takes care of
 		// setting a placeholder image while the background thread runs
-		mImageFetcher.loadImage(
-				Constants.imageThumbUrls[position - mNumColumns],
+		mImageFetcher.loadImage(Constants.imageThumbUrls[position
+				% Constants.imageThumbUrls.length - mNumColumns],
 				ImageSize.medium, imageView);
 
 		return imageView;
-		// END_INCLUDE(load_gridview_item)
 	}
 
 	/**
